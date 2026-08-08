@@ -21,10 +21,10 @@ router = APIRouter(
 
 
 @router.get("/")
-def get_farmers():
-    return {
-        "message": "List of farmers will appear here."
-    }
+def get_farmers(db: Session = Depends(get_db)):
+    farmers = db.query(Farmer).all()
+
+    return farmers
 
 
 @router.post("/")
@@ -37,8 +37,7 @@ def create_farmer(
         phone=farmer.phone,
         email=farmer.email,
         farm_name=farmer.farm_name,
-        location=farmer.location,
-        state=farmer.state
+        location=farmer.location
     )
 
     db.add(new_farmer)
