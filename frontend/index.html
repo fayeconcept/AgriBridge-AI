@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriBridge AI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f8f3;
+            color: #183b20;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #176b35;
+            color: white;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .hero {
+            max-width: 1000px;
+            margin: 60px auto 30px;
+            padding: 0 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 span {
+            color: #2f8f46;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #55705b;
+            max-width: 700px;
+            margin: auto;
+            line-height: 1.6;
+        }
+
+        .ai-card {
+            max-width: 850px;
+            margin: 35px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 130px;
+            padding: 15px;
+            border: 1px solid #ccd9ce;
+            border-radius: 10px;
+            resize: vertical;
+            font-size: 16px;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #2f8f46;
+        }
+
+        button {
+            margin-top: 15px;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #176b35;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0f5428;
+        }
+
+        button:disabled {
+            background: #9aaa9d;
+            cursor: not-allowed;
+        }
+
+        .response-box {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f0f7f1;
+            border-left: 5px solid #2f8f46;
+            border-radius: 8px;
+            line-height: 1.7;
+        }
+
+        .response-box h3 {
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 15px;
+            text-align: center;
+            color: #55705b;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #6b7d6f;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+
+            .tagline {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">🌱 AgriBridge AI</div>
+    <div class="tagline">Smart Agriculture • Better Decisions • Better Harvests</div>
+</header>
+
+<section class="hero">
+    <h1>Your <span>AI Agricultural Assistant</span></h1>
+
+    <p>
+        Ask questions about crops, pests, diseases, soil, fertilizers,
+        weather-related farming challenges and other agricultural problems.
+    </p>
+</section>
+
+<section class="ai-card">
+
+    <label for="question">
+        What is happening on your farm?
+    </label>
+
+    <textarea
+        id="question"
+        placeholder="Example: My maize leaves are turning yellow. What could be the problem?"
+    ></textarea>
+
+    <button id="askButton" onclick="askAI()">
+        Ask AgriBridge AI 🌾
+    </button>
+
+    <div class="loading" id="loading">
+        AgriBridge AI is thinking... 🤖
+    </div>
+
+    <div class="response-box" id="responseBox">
+        <h3>🌱 AgriBridge AI Advice</h3>
+        <div id="response"></div>
+    </div>
+
+</section>
+
+<footer>
+    AgriBridge AI — Using artificial intelligence to support farmers.
+</footer>
+
+<script>
+    async function askAI() {
+
+        const question = document.getElementById("question").value.trim();
+        const button = document.getElementById("askButton");
+        const loading = document.getElementById("loading");
+        const responseBox = document.getElementById("responseBox");
+        const response = document.getElementById("response");
+
+        if (!question) {
+            alert("Please enter your farming question.");
+            return;
+        }
+
+        button.disabled = true;
+        loading.style.display = "block";
+        responseBox.style.display = "none";
+
+        try {
+
+            const result = await fetch(
+                "http://127.0.0.1:8000/ai/ask",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        question: question
+                    })
+                }
+            );
+
+            const data = await result.json();
+
+            if (!result.ok) {
+                throw new Error(data.detail || "Something went wrong.");
+            }
+
+            response.innerText = data.answer;
+
+            responseBox.style.display = "block";
+
+        } catch (error) {
+
+            response.innerText =
+                "Unable to connect to AgriBridge AI. Please make sure the backend server is running.";
+
+            responseBox.style.display = "block";
+
+            console.error(error);
+
+        } finally {
+
+            button.disabled = false;
+            loading.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>
