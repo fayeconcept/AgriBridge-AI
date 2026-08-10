@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from backend.core.database import Base
 
 
@@ -12,3 +12,7 @@ class Farmer(Base):
     farm_name = Column(String)
     location = Column(String)
     state = Column(String, nullable=False)
+    lga = Column(String)
+    farm_size = Column(String)
+    crop_type = Column(String)
+    created_at = Column(DateTime)

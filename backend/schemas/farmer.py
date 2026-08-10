@@ -8,3 +8,6 @@ class FarmerCreate(BaseModel):
     farm_name: str
     location: str
     state: str
+    lga: str
+    farm_size: float
+    crop_type: str

@@ -33,12 +33,16 @@ def create_farmer(
     db: Session = Depends(get_db)
 ):
     new_farmer = Farmer(
-        full_name=farmer.full_name,
-        phone=farmer.phone,
-        email=farmer.email,
-        farm_name=farmer.farm_name,
-        location=farmer.location
-    )
+    full_name=farmer.full_name,
+    phone=farmer.phone,
+    email=farmer.email,
+    farm_name=farmer.farm_name,
+    location=farmer.location,
+    state=farmer.state,
+    lga=farmer.lga,
+    farm_size=farmer.farm_size,
+    crop_type=farmer.crop_type
+)
 
     db.add(new_farmer)
     db.commit()
