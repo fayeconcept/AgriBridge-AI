@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime
+from datetime import datetime
 from backend.core.database import Base
 
 
@@ -15,4 +16,4 @@ class Farmer(Base):
     lga = Column(String)
     farm_size = Column(String)
     crop_type = Column(String)
-    created_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
