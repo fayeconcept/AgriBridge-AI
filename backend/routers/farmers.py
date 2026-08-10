@@ -27,7 +27,7 @@ def get_farmers(db: Session = Depends(get_db)):
     return farmers
 
 
-@router.post("/")
+@router.post("/", response_model=FarmerResponse)
 def create_farmer(
     farmer: FarmerCreate,
     db: Session = Depends(get_db)
@@ -48,7 +48,5 @@ def create_farmer(
     db.commit()
     db.refresh(new_farmer)
 
-    return {
-        "message": "Farmer created successfully.",
-        "id": new_farmer.id
-    }
+    return new_farmer
+ 
