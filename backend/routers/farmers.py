@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from backend.core.database import SessionLocal
 from backend.models.farmer import Farmer
-from backend.schemas.farmer import FarmerCreate
+from backend.schemas.farmer import FarmerCreate, FarmerResponse
 
 
 def get_db():
@@ -20,7 +20,7 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get("/", response_model=list[FarmerResponse])
 def get_farmers(db: Session = Depends(get_db)):
     farmers = db.query(Farmer).all()
 
