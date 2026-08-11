@@ -1,17 +1,16 @@
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 from google import genai
 
 
 # Load variables from .env
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 
 # Get Gemini API key
-
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
@@ -19,7 +18,6 @@ if not api_key:
 
 
 # Create Gemini client
-
 client = genai.Client(api_key=api_key)
 
 
@@ -29,7 +27,8 @@ def ask_agriculture_ai(
     conversation_history: list[str] = []
 ) -> str:
     """
-    Send a farmer's question and farm information to Gemini.
+    Send a farmer's question, farm information,
+    and conversation history to Gemini.
     """
 
     # Keep only the 10 most recent conversation messages
@@ -40,6 +39,12 @@ def ask_agriculture_ai(
         history_text = "\n".join(conversation_history)
     else:
         history_text = "No previous conversation."
+
+    # Get crop age safely
+    if farm_context.crop_age_weeks is not None:
+        crop_age_text = f"{farm_context.crop_age_weeks} weeks"
+    else:
+        crop_age_text = "Not provided"
 
     prompt = f"""
 You are AgriBridge AI, an intelligent agricultural assistant designed
@@ -56,6 +61,7 @@ FARMER INFORMATION:
 - LGA: {farm_context.lga}
 - Crop: {farm_context.crop_type}
 - Farm size: {farm_context.farm_size} hectares
+- Crop age: {crop_age_text}
 
 PREVIOUS CONVERSATION:
 
@@ -89,6 +95,13 @@ IMPORTANT INSTRUCTIONS:
     when useful.
 
 11. Do not recommend dangerous or illegal agricultural practices.
+
+12. Consider the crop age or growth stage when giving advice, especially
+    for fertilizer, irrigation, pest control and disease management.
+
+13. If the crop age is not provided, explain that the recommendation
+    may depend on the crop's growth stage and ask the farmer for the
+    crop age when necessary.
 
 FARMER'S CURRENT QUESTION:
 

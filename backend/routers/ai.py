@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+from typing import Optional
 
 from ai_engine.gemini import ask_agriculture_ai
 
@@ -17,6 +18,7 @@ class FarmContext(BaseModel):
     lga: str
     crop_type: str
     farm_size: float
+    crop_age_weeks: Optional[float] = None
 
 
 class AIQuestion(BaseModel):
@@ -29,9 +31,9 @@ class AIQuestion(BaseModel):
 def ask_ai(data: AIQuestion):
 
     answer = ask_agriculture_ai(
-    data.question,
-    data.farm,
-    data.conversation_history
+        data.question,
+        data.farm,
+        data.conversation_history
     )
 
     return {
