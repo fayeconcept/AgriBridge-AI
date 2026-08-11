@@ -26,24 +26,11 @@ class AIQuestion(BaseModel):
 
 @router.post("/ask")
 def ask_ai(data: AIQuestion):
-    farm_context = f"""
-Farmer Name: {data.farm.farmer_name}
-Location: {data.farm.location}
-State: {data.farm.state}
-LGA: {data.farm.lga}
-Crop Type: {data.farm.crop_type}
-Farm Size: {data.farm.farm_size} hectares
-"""
 
-    full_question = f"""
-Farmer Information:
-{farm_context}
-
-Farmer's Question:
-{data.question}
-"""
-
-    answer = ask_agriculture_ai(full_question)
+    answer = ask_agriculture_ai(
+        data.question,
+        data.farm
+    )
 
     return {
         "answer": answer

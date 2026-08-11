@@ -20,9 +20,9 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 
 
-def ask_agriculture_ai(question: str) -> str:
+def ask_agriculture_ai(question: str, farm_context) -> str:
     """
-    Send a farmer's question to Gemini and return an agricultural response.
+    Send a farmer's question and farm information to Gemini.
     """
 
     prompt = f"""
@@ -32,12 +32,20 @@ to help farmers, especially smallholder farmers in Africa.
 Your goal is to provide practical, safe, clear and easy-to-understand
 agricultural advice.
 
+FARMER INFORMATION:
+- Farmer name: {farm_context.farmer_name}
+- Country/location: {farm_context.location}
+- State: {farm_context.state}
+- LGA: {farm_context.lga}
+- Crop: {farm_context.crop_type}
+- Farm size: {farm_context.farm_size} hectares
+
 IMPORTANT INSTRUCTIONS:
 
-1. Carefully consider the farmer's location, crop type, farm size and
-   other farm information provided in the question.
+1. Personalize your answer using the farmer's information above.
 
-2. Give advice that is relevant to the farmer's specific situation.
+2. Consider the farmer's location, crop type, farm size and question
+   when giving advice.
 
 3. Do not pretend to be certain when there is not enough information.
 
@@ -46,20 +54,19 @@ IMPORTANT INSTRUCTIONS:
 
 5. Give practical steps the farmer can take.
 
-6. Where appropriate, explain when the farmer should contact an
-   agricultural extension officer or agricultural professional.
+6. Explain when the farmer should contact an agricultural extension
+   officer or agricultural professional.
 
-7. Consider African farming conditions when relevant.
+7. Consider African farming conditions where relevant.
 
 8. Avoid unnecessarily complicated technical language.
 
-9. Organize your response with clear headings and numbered steps when
-   useful.
+9. Organize your response with clear headings and numbered steps
+   when useful.
 
 10. Do not recommend dangerous or illegal agricultural practices.
 
-Farmer's question and farm information:
-
+FARMER'S QUESTION:
 {question}
 """
 
