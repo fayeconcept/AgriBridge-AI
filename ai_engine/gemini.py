@@ -36,7 +36,10 @@ def ask_agriculture_ai(
     conversation_history = conversation_history[-10:]
 
     # Convert conversation history into readable text
-    history_text = "\n".join(conversation_history)
+    if conversation_history:
+        history_text = "\n".join(conversation_history)
+    else:
+        history_text = "No previous conversation."
 
     prompt = f"""
 You are AgriBridge AI, an intelligent agricultural assistant designed
