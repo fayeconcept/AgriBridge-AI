@@ -22,14 +22,16 @@ class FarmContext(BaseModel):
 class AIQuestion(BaseModel):
     question: str
     farm: FarmContext
+    conversation_history: list[str] = []
 
 
 @router.post("/ask")
 def ask_ai(data: AIQuestion):
 
     answer = ask_agriculture_ai(
-        data.question,
-        data.farm
+    data.question,
+    data.farm,
+    data.conversation_history
     )
 
     return {
