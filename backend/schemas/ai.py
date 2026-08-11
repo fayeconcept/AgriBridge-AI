@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 
 
@@ -15,7 +15,7 @@ class FarmContext(BaseModel):
 class AIQuestion(BaseModel):
     question: str
     farm: FarmContext
-    conversation_history: list[str] = []
+    conversation_history: list[str] = Field(default_factory=list)
 
 
 class AIResponse(BaseModel):
