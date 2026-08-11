@@ -3,7 +3,6 @@ from fastapi import APIRouter
 from ai_engine.gemini import ask_agriculture_ai
 from backend.schemas.ai import AIQuestion
 
-
 router = APIRouter(
     prefix="/ai",
     tags=["AI"]
