@@ -16,3 +16,7 @@ class AIQuestion(BaseModel):
     question: str
     farm: FarmContext
     conversation_history: list[str] = []
+
+
+class AIResponse(BaseModel):
+    answer: str
