@@ -1,8 +1,6 @@
 from fastapi import APIRouter
-
-from ai_engine.gemini import ask_agriculture_ai
 from backend.schemas.ai import AIQuestion, AIResponse
-
+from ai_engine.gemini import ask_agriculture_ai
 
 router = APIRouter(
     prefix="/ai",
@@ -12,7 +10,6 @@ router = APIRouter(
 
 @router.post("/ask", response_model=AIResponse)
 def ask_ai(data: AIQuestion):
-
     answer = ask_agriculture_ai(
         data.question,
         data.farm,
