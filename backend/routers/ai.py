@@ -22,3 +22,11 @@ def ask_ai(data: AIQuestion):
     return {
         "answer": answer
     }
+
+
+@router.get("/health")
+def ai_health():
+    return {
+        "status": "AI service is running",
+        "service": "AgriBridge AI"
+    }
