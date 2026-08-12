@@ -27,3 +27,12 @@ def ai_health():
         "status": "AI service is running",
         "service": "AgriBridge AI"
     }
+
+
+@router.get("/info")
+def ai_info():
+    return {
+        "service": "AgriBridge AI",
+        "provider": "Google Gemini",
+        "status": "AI integration configured"
+    }

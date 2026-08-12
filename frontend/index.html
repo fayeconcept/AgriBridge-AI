@@ -1,270 +1,522 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>AgriBridge AI</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f4f8f3;
-            color: #183b20;
-            min-height: 100vh;
-        }
-
-        header {
-            background: #176b35;
-            color: white;
-            padding: 20px 8%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .tagline {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .hero {
-            max-width: 1000px;
-            margin: 60px auto 30px;
-            padding: 0 20px;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-size: 42px;
-            margin-bottom: 15px;
-        }
-
-        .hero h1 span {
-            color: #2f8f46;
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: #55705b;
-            max-width: 700px;
-            margin: auto;
-            line-height: 1.6;
-        }
-
-        .ai-card {
-            max-width: 850px;
-            margin: 35px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 18px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 130px;
-            padding: 15px;
-            border: 1px solid #ccd9ce;
-            border-radius: 10px;
-            resize: vertical;
-            font-size: 16px;
-            outline: none;
-        }
-
-        textarea:focus {
-            border-color: #2f8f46;
-        }
-
-        button {
-            margin-top: 15px;
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: #176b35;
-            color: white;
-            font-size: 17px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #0f5428;
-        }
-
-        button:disabled {
-            background: #9aaa9d;
-            cursor: not-allowed;
-        }
-
-        .response-box {
-            display: none;
-            margin-top: 25px;
-            padding: 20px;
-            background: #f0f7f1;
-            border-left: 5px solid #2f8f46;
-            border-radius: 8px;
-            line-height: 1.7;
-        }
-
-        .response-box h3 {
-            margin-bottom: 10px;
-        }
-
-        .loading {
-            display: none;
-            margin-top: 15px;
-            text-align: center;
-            color: #55705b;
-        }
-
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: #6b7d6f;
-            font-size: 14px;
-        }
-
-        @media (max-width: 600px) {
-            .hero h1 {
-                font-size: 32px;
-            }
-
-            header {
-                padding: 18px 5%;
-            }
-
-            .tagline {
-                display: none;
-            }
-        }
-    </style>
 </head>
+
 
 <body>
 
-<header>
-    <div class="logo">🌱 AgriBridge AI</div>
-    <div class="tagline">Smart Agriculture • Better Decisions • Better Harvests</div>
-</header>
 
-<section class="hero">
-    <h1>Your <span>AI Agricultural Assistant</span></h1>
+    <!-- =====================================================
+         TOP BAR
+    ====================================================== -->
 
-    <p>
-        Ask questions about crops, pests, diseases, soil, fertilizers,
-        weather-related farming challenges and other agricultural problems.
-    </p>
-</section>
+    <header class="topbar">
 
-<section class="ai-card">
+        <div class="brand">
 
-    <label for="question">
-        What is happening on your farm?
-    </label>
+            <div class="logo">
+                🌾
+            </div>
 
-    <textarea
-        id="question"
-        placeholder="Example: My maize leaves are turning yellow. What could be the problem?"
-    ></textarea>
+            <div>
 
-    <button id="askButton" onclick="askAI()">
-        Ask AgriBridge AI 🌾
-    </button>
+                <h1>
+                    AgriBridge AI
+                </h1>
 
-    <div class="loading" id="loading">
-        AgriBridge AI is thinking... 🤖
-    </div>
+                <p>
+                    Intelligent Agricultural Assistant
+                </p>
 
-    <div class="response-box" id="responseBox">
-        <h3>🌱 AgriBridge AI Advice</h3>
-        <div id="response"></div>
-    </div>
+            </div>
 
-</section>
+        </div>
 
-<footer>
-    AgriBridge AI — Using artificial intelligence to support farmers.
-</footer>
 
-<script>
-    async function askAI() {
+        <div class="status">
 
-        const question = document.getElementById("question").value.trim();
-        const button = document.getElementById("askButton");
-        const loading = document.getElementById("loading");
-        const responseBox = document.getElementById("responseBox");
-        const response = document.getElementById("response");
+            <span class="status-dot"></span>
 
-        if (!question) {
-            alert("Please enter your farming question.");
-            return;
-        }
+            AI Online
 
-        button.disabled = true;
-        loading.style.display = "block";
-        responseBox.style.display = "none";
+        </div>
 
-        try {
+    </header>
 
-            const result = await fetch(
-                "http://127.0.0.1:8000/ai/ask",
-                {
-                    method: "POST",
 
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
 
-                    body: JSON.stringify({
-                        question: question
-                    })
-                }
-            );
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
 
-            const data = await result.json();
+    <main class="container">
 
-            if (!result.ok) {
-                throw new Error(data.detail || "Something went wrong.");
-            }
 
-            response.innerText = data.answer;
+        <!-- =================================================
+             HERO
+        ================================================== -->
 
-            responseBox.style.display = "block";
+        <section class="hero">
 
-        } catch (error) {
+            <div>
 
-            response.innerText =
-                "Unable to connect to AgriBridge AI. Please make sure the backend server is running.";
+                <h2>
+                    Your Smart Farming Assistant
+                </h2>
 
-            responseBox.style.display = "block";
+                <p>
+                    Get personalized agricultural guidance based
+                    on your farm, crop, location and growing stage.
+                </p>
 
-            console.error(error);
+            </div>
 
-        } finally {
+        </section>
 
-            button.disabled = false;
-            loading.style.display = "none";
-        }
-    }
-</script>
+
+
+        <!-- =================================================
+             DASHBOARD
+        ================================================== -->
+
+        <div class="dashboard">
+
+
+
+            <!-- =============================================
+                 FARM INFORMATION
+            ============================================== -->
+
+            <section class="card farm-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            🌱 Farm Information
+                        </h3>
+
+                        <p>
+                            Tell AgriBridge about your farm.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- FARMER NAME -->
+
+                <div class="form-group">
+
+                    <label for="farmerName">
+                        Farmer Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="farmerName"
+                        placeholder="Enter farmer name"
+                        value="Test Farmer"
+                    >
+
+                </div>
+
+
+
+                <!-- LOCATION -->
+
+                <div class="form-group">
+
+                    <label for="location">
+                        Location
+                    </label>
+
+                    <input
+                        type="text"
+                        id="location"
+                        placeholder="e.g. Bwari"
+                        value="Bwari"
+                    >
+
+                </div>
+
+
+
+                <!-- STATE + LGA -->
+
+                <div class="form-row">
+
+
+                    <div class="form-group">
+
+                        <label for="state">
+                            State
+                        </label>
+
+                        <input
+                            type="text"
+                            id="state"
+                            placeholder="e.g. FCT"
+                            value="FCT"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="lga">
+                            LGA
+                        </label>
+
+                        <input
+                            type="text"
+                            id="lga"
+                            placeholder="e.g. Bwari"
+                            value="Bwari"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- CROP -->
+
+                <div class="form-group">
+
+                    <label for="cropType">
+                        Crop Type
+                    </label>
+
+                    <input
+                        type="text"
+                        id="cropType"
+                        placeholder="e.g. Maize"
+                        value="Maize"
+                    >
+
+                </div>
+
+
+
+                <!-- FARM SIZE + CROP AGE -->
+
+                <div class="form-row">
+
+
+                    <div class="form-group">
+
+                        <label for="farmSize">
+                            Farm Size (hectares)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="farmSize"
+                            value="2"
+                            min="0"
+                            step="0.1"
+                        >
+
+                    </div>
+
+
+
+                    <div class="form-group">
+
+                        <label for="cropAge">
+                            Crop Age (weeks)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="cropAge"
+                            value="6"
+                            min="0"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =========================================
+                     FARM SNAPSHOT
+                ========================================== -->
+
+                <div class="farm-snapshot">
+
+                    <div class="snapshot-header">
+
+                        <div class="snapshot-icon">
+                            🌾
+                        </div>
+
+                        <div>
+
+                            <strong>
+                                Your Farm Snapshot
+                            </strong>
+
+                            <span>
+                                Farm profile ready
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <div class="snapshot-grid">
+
+
+                        <div class="snapshot-item">
+
+                            <span class="snapshot-label">
+                                Farmer
+                            </span>
+
+                            <strong id="snapshotFarmer">
+                                Test Farmer
+                            </strong>
+
+                        </div>
+
+
+
+                        <div class="snapshot-item">
+
+                            <span class="snapshot-label">
+                                Crop
+                            </span>
+
+                            <strong id="snapshotCrop">
+                                Maize
+                            </strong>
+
+                        </div>
+
+
+
+                        <div class="snapshot-item">
+
+                            <span class="snapshot-label">
+                                Farm Size
+                            </span>
+
+                            <strong id="snapshotSize">
+                                2 hectares
+                            </strong>
+
+                        </div>
+
+
+
+                        <div class="snapshot-item">
+
+                            <span class="snapshot-label">
+                                Crop Age
+                            </span>
+
+                            <strong id="snapshotAge">
+                                6 weeks
+                            </strong>
+
+                        </div>
+
+
+
+                        <div class="snapshot-location">
+
+                            <span>
+                                📍
+                            </span>
+
+                            <strong id="snapshotLocation">
+                                Bwari, FCT
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+
+            <!-- =============================================
+                 AI ASSISTANT
+            ============================================== -->
+
+            <section class="card ai-card">
+
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h3>
+                            🤖 Ask AgriBridge AI
+                        </h3>
+
+                        <p>
+                            Describe the problem you are
+                            experiencing.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- QUESTION -->
+
+                <div class="form-group">
+
+                    <label for="question">
+
+                        What is happening on your farm?
+
+                    </label>
+
+
+                    <textarea
+                        id="question"
+                        rows="7"
+                        placeholder="Example: My maize leaves are turning yellow. What could be the problem and what should I do?"
+                    >My maize leaves are turning yellow. What could be the problem and what should I do?</textarea>
+
+                </div>
+
+
+
+                <!-- ASK BUTTON -->
+
+                <button
+                    id="askButton"
+                    onclick="askAI()"
+                >
+
+                    <span id="buttonText">
+                        Ask AgriBridge AI
+                    </span>
+
+                    <span
+                        id="loadingText"
+                        class="hidden"
+                    >
+                        Thinking...
+                    </span>
+
+                </button>
+
+
+
+                <!-- ERROR -->
+
+                <div
+                    id="errorMessage"
+                    class="error hidden"
+                ></div>
+
+
+
+                <!-- AI RESPONSE -->
+
+                <div class="response-box">
+
+
+                    <div class="response-title">
+
+                        <span>
+                            🤖
+                        </span>
+
+                        <strong>
+                            AgriBridge AI Response
+                        </strong>
+
+                    </div>
+
+
+                    <div
+                        id="aiResponse"
+                        class="ai-response"
+                    >
+
+                        Your AI-generated agricultural
+                        advice will appear here.
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer>
+
+        <p>
+            AgriBridge AI • Powered by Google Gemini
+        </p>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="app.js"></script>
+
 
 </body>
+
 </html>

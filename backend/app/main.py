@@ -1,19 +1,36 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from backend.routers import farmers
 from backend.routers import ai
 from backend.core.database import engine
 
+
 app = FastAPI(
     title="AgriBridge AI API",
     version="1.0.0"
 )
 
+
+# Allow the frontend to communicate with the FastAPI backend
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 # Existing farmer routes
+
 app.include_router(farmers.router)
 
+
 # AgriBridge AI routes
+
 app.include_router(ai.router)
 
 
@@ -26,10 +43,13 @@ def root():
 
 @app.get("/db-test")
 def test_database():
+
     with engine.connect() as connection:
+
         result = connection.execute(
             text("SELECT current_database();")
         )
+
         db_name = result.scalar()
 
     return {

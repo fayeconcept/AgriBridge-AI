@@ -6,11 +6,13 @@ from google import genai
 
 
 # Load variables from .env
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 
 # Get Gemini API key
+
 api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
@@ -18,6 +20,7 @@ if not api_key:
 
 
 # Create Gemini client
+
 client = genai.Client(api_key=api_key)
 
 
@@ -32,19 +35,27 @@ def ask_agriculture_ai(
     """
 
     # Keep only the 10 most recent conversation messages
+
     conversation_history = conversation_history[-10:]
 
+
     # Convert conversation history into readable text
+
     if conversation_history:
         history_text = "\n".join(conversation_history)
     else:
         history_text = "No previous conversation."
 
+
     # Get crop age safely
+
     if farm_context.crop_age_weeks is not None:
         crop_age_text = f"{farm_context.crop_age_weeks} weeks"
     else:
         crop_age_text = "Not provided"
+
+
+    # Build the AI prompt
 
     prompt = f"""
 You are AgriBridge AI, an intelligent agricultural assistant designed
@@ -108,7 +119,11 @@ FARMER'S CURRENT QUESTION:
 {question}
 """
 
+
+    # Send request to Gemini
+
     try:
+
         response = client.models.generate_content(
             model="gemini-3.6-flash",
             contents=prompt
@@ -116,17 +131,12 @@ FARMER'S CURRENT QUESTION:
 
         return response.text
 
+
     except Exception as e:
-        error_message = str(e)
 
-        if "429" in error_message or "RESOURCE_EXHAUSTED" in error_message:
-            return (
-                "AgriBridge AI is temporarily unable to process your request "
-                "because the Gemini AI service has reached its current usage "
-                "limit. Please try again later."
-            )
+        # Print the real Gemini error in the PowerShell terminal
+        # so we can diagnose the problem.
 
-        return (
-            "AgriBridge AI encountered a temporary AI service error. "
-            "Please try again later."
-        )
+        print("GEMINI ERROR:", repr(e))
+
+        raise
