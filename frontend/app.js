@@ -198,8 +198,8 @@ async function askAI() {
 
     try {
 
-        const response = await fetch(
-            "http://https://agribridge-ai-gtho.onrender.com/ai/ask",
+    const response = await fetch(
+    "https://agribridge-ai-gtho.onrender.com/ai/ask",
             {
                 method: "POST",
 

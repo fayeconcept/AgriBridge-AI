@@ -1,307 +1,363 @@
-from typing import Optional
+import re
 
 
 # =========================================================
 # AGRIBRIDGE AI FALLBACK ENGINE
 # =========================================================
 #
-# This module provides basic agricultural responses when
-# Gemini is temporarily unavailable.
+# This engine is used when Gemini is unavailable,
+# including quota/rate-limit situations.
 #
-# It is NOT intended to replace Gemini.
-# It provides useful responses for common, calculation-based
-# agricultural questions.
+# It provides practical answers for common agricultural
+# questions without requiring an external AI service.
 # =========================================================
 
+
+def _get_farm_value(farm_context, name, default=None):
+    """Safely get information from the farm context."""
+    return getattr(
+        farm_context,
+        name,
+        default
+    )
+
+
+def _get_farm_context(farm_context):
+    """Collect the farmer's basic farm information."""
+
+    return {
+        "farmer_name": _get_farm_value(
+            farm_context,
+            "farmer_name",
+            "Farmer"
+        ),
+        "location": _get_farm_value(
+            farm_context,
+            "location",
+            "Not provided"
+        ),
+        "state": _get_farm_value(
+            farm_context,
+            "state",
+            "Not provided"
+        ),
+        "lga": _get_farm_value(
+            farm_context,
+            "lga",
+            "Not provided"
+        ),
+        "crop_type": _get_farm_value(
+            farm_context,
+            "crop_type",
+            "Not provided"
+        ),
+        "farm_size": _get_farm_value(
+            farm_context,
+            "farm_size",
+            None
+        ),
+        "crop_age_weeks": _get_farm_value(
+            farm_context,
+            "crop_age_weeks",
+            None
+        ),
+    }
+
+
+def _extract_number(text):
+    """Find the first useful number in a question."""
+
+    match = re.search(
+        r"\b(\d+(?:\.\d+)?)\b",
+        text
+    )
+
+    if match:
+        return float(match.group(1))
+
+    return None
+
+
+# =========================================================
+# MAIZE SEED CALCULATOR
+# =========================================================
+
+def _maize_seed_answer(
+    question,
+    farm
+):
+    """Answer common maize seed quantity questions."""
+
+    farm_size = farm["farm_size"]
+
+    if farm_size is None:
+
+        farm_size = _extract_number(question)
+
+    if farm_size is None:
+
+        farm_size = 1
+
+    seed_low = farm_size * 20
+    seed_high = farm_size * 25
+
+    farmer_name = farm["farmer_name"]
+
+    return (
+        f"Hello {farmer_name},\n\n"
+        f"For your **{farm_size:g} hectare(s)** of maize, "
+        f"a practical planning range is approximately "
+        f"**20–25 kg of certified seed per hectare**.\n\n"
+        f"### Estimated seed requirement\n\n"
+        f"- Farm size: **{farm_size:g} hectares**\n"
+        f"- Planning rate: **20–25 kg/hectare**\n"
+        f"- Estimated seed: **{seed_low:g}–{seed_high:g} kg**\n\n"
+        f"If you have already bought **50 kg**, that is within "
+        f"the upper end of the normal planning range for a "
+        f"2-hectare farm.\n\n"
+        f"### How to avoid wasting the seed\n\n"
+        f"1. Follow the planting spacing recommended for your "
+        f"specific maize variety.\n"
+        f"2. Measure the field and divide the available seed "
+        f"across the 2 hectares rather than using it all at once.\n"
+        f"3. Avoid putting extra seeds in each planting hole "
+        f"unless the recommended planting method calls for it.\n"
+        f"4. Keep a small quantity available for gap filling "
+        f"after germination.\n"
+        f"5. Check the seed company's label for the recommended "
+        f"plant population and seed rate.\n\n"
+        f"### Important\n\n"
+        f"The exact amount depends on the maize variety, seed "
+        f"size, germination rate and planting method. Use the "
+        f"manufacturer's recommended seed rate where it differs "
+        f"from this planning estimate."
+    )
+
+
+# =========================================================
+# MAIZE SPACING
+# =========================================================
+
+def _maize_spacing_answer(
+    farm
+):
+    """Answer common maize spacing questions."""
+
+    farmer_name = farm["farmer_name"]
+
+    return (
+        f"Hello {farmer_name},\n\n"
+        f"For maize, a commonly used spacing arrangement is "
+        f"about **75 cm between rows and 25 cm between plants** "
+        f"when planting one plant per stand.\n\n"
+        f"This is only a general planning guide. The recommended "
+        f"spacing can vary according to the maize variety, "
+        f"production system and the seed company's instructions.\n\n"
+        f"Before planting, check the seed bag label for the "
+        f"recommended plant population and spacing.\n\n"
+        f"If you tell me the maize variety you bought, I can "
+        f"help you understand the recommended spacing."
+    )
+
+
+# =========================================================
+# FARM SIZE
+# =========================================================
+
+def _farm_size_answer(
+    farm
+):
+    """Give a simple farm-size response."""
+
+    farmer_name = farm["farmer_name"]
+    farm_size = farm["farm_size"]
+
+    if farm_size is None:
+
+        return (
+            f"Hello {farmer_name},\n\n"
+            f"I don't yet have your farm size. Please provide "
+            f"the number of hectares so I can calculate quantities "
+            f"for your farm."
+        )
+
+    return (
+        f"Hello {farmer_name},\n\n"
+        f"Your farm profile shows a farm size of "
+        f"**{farm_size:g} hectares**.\n\n"
+        f"I can use this information when calculating seed, "
+        f"fertilizer or other farm requirements, but the exact "
+        f"rate will depend on the crop and input being discussed."
+    )
+
+
+# =========================================================
+# CROP AGE
+# =========================================================
+
+def _crop_age_answer(
+    farm
+):
+    """Answer when crop age is available."""
+
+    farmer_name = farm["farmer_name"]
+    crop = farm["crop_type"]
+    age = farm["crop_age_weeks"]
+
+    if age is None:
+
+        return (
+            f"Hello {farmer_name},\n\n"
+            f"I don't have the age of your {crop} crop. "
+            f"Please provide the crop age in weeks if your "
+            f"question depends on the crop's growth stage."
+        )
+
+    return (
+        f"Hello {farmer_name},\n\n"
+        f"Your farm profile indicates that your {crop} crop "
+        f"is approximately **{age:g} weeks old**.\n\n"
+        f"Advice at this stage depends on the crop's growth "
+        f"condition, variety and the specific problem you are "
+        f"experiencing."
+    )
+
+
+# =========================================================
+# GENERAL AGRICULTURAL RESPONSE
+# =========================================================
+
+def _general_answer(
+    question,
+    farm
+):
+    """Safe general response when no specific rule matches."""
+
+    farmer_name = farm["farmer_name"]
+    crop = farm["crop_type"]
+    location = farm["location"]
+
+    return (
+        f"Hello {farmer_name},\n\n"
+        f"I understand your question about **{crop} farming** "
+        f"in **{location}**.\n\n"
+        f"Gemini is temporarily unavailable, so AgriBridge AI "
+        f"is using its local agricultural fallback assistant.\n\n"
+        f"I can still help with basic farm planning, including "
+        f"seed quantities, planting spacing, crop age and "
+        f"general farm management.\n\n"
+        f"For questions involving specific pesticides, "
+        f"fertilizers, diseases, weather conditions or serious "
+        f"crop problems, please confirm the recommendation with "
+        f"a qualified agricultural extension officer or agronomist."
+    )
+
+
+# =========================================================
+# MAIN FALLBACK FUNCTION
+# =========================================================
 
 def fallback_agriculture_ai(
     question: str,
     farm_context
-) -> Optional[str]:
-
+) -> str:
     """
-    Provide a basic agricultural response when Gemini
-    cannot process the request.
-
-    Returns:
-        str: Fallback answer
-        None: If the question is outside the supported
-              fallback topics.
+    Provide a local agricultural response when Gemini
+    is unavailable.
     """
 
-    # =====================================================
-    # GET FARM INFORMATION
-    # =====================================================
-
-    farmer_name = getattr(
-        farm_context,
-        "farmer_name",
-        "Farmer"
+    farm = _get_farm_context(
+        farm_context
     )
 
-    location = getattr(
-        farm_context,
-        "location",
-        "your location"
-    )
-
-    state = getattr(
-        farm_context,
-        "state",
-        ""
-    )
-
-    lga = getattr(
-        farm_context,
-        "lga",
-        ""
-    )
-
-    crop_type = getattr(
-        farm_context,
-        "crop_type",
-        ""
-    )
-
-    farm_size = getattr(
-        farm_context,
-        "farm_size",
-        None
-    )
-
-    crop_age = getattr(
-        farm_context,
-        "crop_age_weeks",
-        None
+    question_text = (
+        question
+        .strip()
+        .lower()
     )
 
 
     # =====================================================
-    # NORMALIZE QUESTION
-    # =====================================================
-
-    q = question.lower().strip()
-
-
-    # =====================================================
-    # DETECT MAIZE
-    # =====================================================
-
-    maize_question = (
-        "maize" in q
-        or "corn" in q
-    )
-
-
-    # =====================================================
-    # SEED REQUIREMENT
+    # MAIZE SEED QUESTIONS
     # =====================================================
 
     seed_keywords = [
-        "seed",
-        "seeds",
         "how much seed",
+        "how many kg of seed",
+        "seed will i need",
+        "seed do i need",
+        "seed requirement",
         "seed quantity",
-        "seed rate",
         "kg of seed",
-        "kilogram of seed"
+        "bought 50 kg",
+        "bought 50kg",
+        "50 kg of seed",
+        "50kg of seed",
     ]
 
-    asks_seed = any(
-        keyword in q
-        for keyword in seed_keywords
-    )
+    if (
+        "maize" in question_text
+        or str(farm["crop_type"]).lower() == "maize"
+    ):
 
+        if any(
+            keyword in question_text
+            for keyword in seed_keywords
+        ):
 
-    if maize_question and asks_seed:
-
-        if farm_size is not None:
-
-            try:
-                hectares = float(farm_size)
-
-                if hectares > 0:
-
-                    low_rate = 20
-                    high_rate = 25
-
-                    low_quantity = hectares * low_rate
-                    high_quantity = hectares * high_rate
-
-                    return (
-                        f"Hello {farmer_name},\n\n"
-                        f"For maize farming on your "
-                        f"{hectares:g}-hectare farm in "
-                        f"{location}, a commonly used "
-                        f"planning range is approximately "
-                        f"{low_rate}–{high_rate} kg of "
-                        f"certified seed per hectare.\n\n"
-                        f"### Estimated seed requirement\n\n"
-                        f"- Farm size: {hectares:g} hectares\n"
-                        f"- Planning rate: {low_rate}–{high_rate} kg/hectare\n"
-                        f"- Estimated seed: "
-                        f"**{low_quantity:g}–{high_quantity:g} kg**\n\n"
-                        f"So, for your farm, plan for approximately "
-                        f"**{low_quantity:g}–{high_quantity:g} kg "
-                        f"of maize seed**.\n\n"
-                        f"The exact seed requirement can vary "
-                        f"depending on variety, planting spacing, "
-                        f"seed size and the recommended plant "
-                        f"population. Check the seed company's "
-                        f"recommended planting rate before buying.\n\n"
-                        f"Buy certified seed from a reliable "
-                        f"agricultural seed supplier."
-                    )
-
-            except (TypeError, ValueError):
-                pass
+            return _maize_seed_answer(
+                question,
+                farm
+            )
 
 
     # =====================================================
-    # GENERAL MAIZE PLANTING
+    # MAIZE SPACING QUESTIONS
     # =====================================================
 
-    planting_keywords = [
-        "when should i plant",
-        "when can i plant",
-        "when to plant",
-        "planting time",
-        "plant maize",
-        "planting maize"
-    ]
+    if (
+        "maize" in question_text
+        or str(farm["crop_type"]).lower() == "maize"
+    ):
 
-    asks_planting = any(
-        keyword in q
-        for keyword in planting_keywords
-    )
+        if (
+            "spacing" in question_text
+            or "distance" in question_text
+            or "row" in question_text
+        ):
+
+            return _maize_spacing_answer(
+                farm
+            )
 
 
-    if maize_question and asks_planting:
+    # =====================================================
+    # FARM SIZE QUESTIONS
+    # =====================================================
 
-        return (
-            f"Hello {farmer_name},\n\n"
-            f"For maize farming in {location}, "
-            f"planting should generally be timed with "
-            f"the establishment of reliable rainfall for "
-            f"rainfed production.\n\n"
-            f"### Before planting\n\n"
-            f"1. Prepare the land before the main rains "
-            f"become established.\n"
-            f"2. Wait for consistent rainfall and adequate "
-            f"soil moisture rather than relying on one "
-            f"isolated shower.\n"
-            f"3. Choose a maize variety appropriate for "
-            f"your local growing conditions and intended "
-            f"harvest period.\n"
-            f"4. Have certified seed and fertilizer ready "
-            f"before planting.\n\n"
-            f"The exact planting window can vary by season, "
-            f"rainfall pattern, variety and location. For "
-            f"your farm in {location}, a local agricultural "
-            f"extension officer can provide the most "
-            f"accurate seasonal recommendation."
+    if (
+        "farm size" in question_text
+        or "how big is my farm" in question_text
+        or "how many hectares" in question_text
+    ):
+
+        return _farm_size_answer(
+            farm
         )
 
 
     # =====================================================
-    # MAIZE SPACING
+    # CROP AGE QUESTIONS
     # =====================================================
 
-    spacing_keywords = [
-        "spacing",
-        "plant spacing",
-        "plant distance",
-        "row spacing",
-        "how far apart"
-    ]
+    if (
+        "how old is my crop" in question_text
+        or "crop age" in question_text
+        or "how many weeks" in question_text
+    ):
 
-    asks_spacing = any(
-        keyword in q
-        for keyword in spacing_keywords
-    )
-
-
-    if maize_question and asks_spacing:
-
-        return (
-            f"Hello {farmer_name},\n\n"
-            f"For maize, spacing is important because it "
-            f"affects plant population and yield.\n\n"
-            f"A commonly used starting point is around "
-            f"**75 cm between rows and 25 cm between plants** "
-            f"with one healthy plant per stand.\n\n"
-            f"However, the recommended spacing can differ "
-            f"by variety, target plant population, soil "
-            f"fertility and production system.\n\n"
-            f"Check the seed manufacturer's recommendation "
-            f"for the particular variety you are planting."
-        )
-
-
-    # =====================================================
-    # FARM SIZE
-    # =====================================================
-
-    farm_size_keywords = [
-        "farm size",
-        "hectares",
-        "hectare",
-        "how big is my farm"
-    ]
-
-    asks_farm_size = any(
-        keyword in q
-        for keyword in farm_size_keywords
-    )
-
-
-    if asks_farm_size and farm_size is not None:
-
-        try:
-
-            hectares = float(farm_size)
-
-            if hectares > 0:
-
-                return (
-                    f"Your farm profile currently shows "
-                    f"**{hectares:g} hectares**.\n\n"
-                    f"This farm size can be used to estimate "
-                    f"seed, fertilizer and other input "
-                    f"requirements, but the exact quantity "
-                    f"depends on the crop and recommended "
-                    f"application rate."
-                )
-
-        except (TypeError, ValueError):
-            pass
-
-
-    # =====================================================
-    # CROP AGE
-    # =====================================================
-
-    age_keywords = [
-        "crop age",
-        "how old",
-        "how many weeks",
-        "crop is"
-    ]
-
-    asks_crop_age = any(
-        keyword in q
-        for keyword in age_keywords
-    )
-
-
-    if asks_crop_age and crop_age is not None:
-
-        return (
-            f"The current farm profile shows the crop age "
-            f"as approximately **{crop_age} weeks**.\n\n"
-            f"Crop-stage recommendations should also "
-            f"consider the specific crop, variety and "
-            f"actual field condition."
+        return _crop_age_answer(
+            farm
         )
 
 
@@ -309,20 +365,7 @@ def fallback_agriculture_ai(
     # GENERAL FALLBACK
     # =====================================================
 
-    return (
-        f"Hello {farmer_name},\n\n"
-        f"I understand your question about farming "
-        f"in {location}.\n\n"
-        f"Gemini is temporarily unavailable, so I cannot "
-        f"provide the full AgriBridge AI analysis right now.\n\n"
-        f"Your farm profile is still available:\n\n"
-        f"- Location: {location}\n"
-        f"- State: {state}\n"
-        f"- LGA: {lga}\n"
-        f"- Profile crop: {crop_type}\n"
-        f"- Farm size: {farm_size} hectares\n\n"
-        f"Please try the question again when the AI service "
-        f"is available. For important farm decisions, "
-        f"confirm recommendations with a qualified "
-        f"agricultural extension officer."
+    return _general_answer(
+        question,
+        farm
     )

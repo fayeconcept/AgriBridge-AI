@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
+from pathlib import Path
 
 from backend.routers import farmers
 from backend.routers import ai
@@ -13,7 +15,9 @@ app = FastAPI(
 )
 
 
-# Allow the frontend to communicate with the FastAPI backend
+# =========================================
+# CORS
+# =========================================
 
 app.add_middleware(
     CORSMiddleware,
@@ -24,22 +28,17 @@ app.add_middleware(
 )
 
 
-# Existing farmer routes
+# =========================================
+# API ROUTES
+# =========================================
 
 app.include_router(farmers.router)
-
-
-# AgriBridge AI routes
-
 app.include_router(ai.router)
 
 
-@app.get("/")
-def root():
-    return {
-        "message": "Welcome to AgriBridge AI API!"
-    }
-
+# =========================================
+# DATABASE TEST
+# =========================================
 
 @app.get("/db-test")
 def test_database():
@@ -56,3 +55,22 @@ def test_database():
         "status": "Database connected successfully!",
         "database": db_name
     }
+
+
+# =========================================
+# FRONTEND
+# =========================================
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
+
+
+# Serve the frontend after the API routes
+app.mount(
+    "/",
+    StaticFiles(
+        directory=FRONTEND_DIR,
+        html=True
+    ),
+    name="frontend"
+)
