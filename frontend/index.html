@@ -117,7 +117,9 @@
             </div>
 
 
-            <!-- FARMER NAME -->
+            <!-- =========================================
+                 FARMER NAME
+            ========================================== -->
 
             <div class="form-group">
 
@@ -135,7 +137,69 @@
             </div>
 
 
-            <!-- LOCATION -->
+            <!-- =========================================
+                 PHONE
+            ========================================== -->
+
+            <div class="form-group">
+
+                <label for="phone">
+                    Phone Number
+                </label>
+
+                <input
+                    type="tel"
+                    id="phone"
+                    placeholder="e.g. 08012345678"
+                    value="08000000000"
+                >
+
+            </div>
+
+
+            <!-- =========================================
+                 EMAIL
+            ========================================== -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="e.g. farmer@example.com"
+                    value="testfarmer@example.com"
+                >
+
+            </div>
+
+
+            <!-- =========================================
+                 FARM NAME
+            ========================================== -->
+
+            <div class="form-group">
+
+                <label for="farmName">
+                    Farm Name
+                </label>
+
+                <input
+                    type="text"
+                    id="farmName"
+                    placeholder="e.g. Test Maize Farm"
+                    value="Test Maize Farm"
+                >
+
+            </div>
+
+
+            <!-- =========================================
+                 LOCATION
+            ========================================== -->
 
             <div class="form-group">
 
@@ -153,7 +217,9 @@
             </div>
 
 
-            <!-- STATE + LGA -->
+            <!-- =========================================
+                 STATE + LGA
+            ========================================== -->
 
             <div class="form-row">
 
@@ -191,7 +257,9 @@
             </div>
 
 
-            <!-- CROP -->
+            <!-- =========================================
+                 CROP
+            ========================================== -->
 
             <div class="form-group">
 
@@ -209,7 +277,9 @@
             </div>
 
 
-            <!-- FARM SIZE + CROP AGE -->
+            <!-- =========================================
+                 FARM SIZE + CROP AGE
+            ========================================== -->
 
             <div class="form-row">
 
@@ -345,6 +415,41 @@
 
             </div>
 
+
+            <!-- =========================================
+                 SAVE FARM PROFILE
+            ========================================== -->
+
+            <button
+                id="saveFarmButton"
+                type="button"
+                onclick="saveFarmProfile()"
+            >
+
+                <span id="saveFarmButtonText">
+                    💾 Save Farm Profile
+                </span>
+
+                <span
+                    id="saveFarmLoadingText"
+                    class="hidden"
+                >
+                    Saving...
+                </span>
+
+            </button>
+
+
+            <!-- =========================================
+                 FARM SAVE MESSAGE
+            ========================================== -->
+
+            <div
+                id="farmSaveMessage"
+                class="farm-save-message hidden"
+            ></div>
+
+
         </section>
 
 
@@ -372,7 +477,9 @@
             </div>
 
 
-            <!-- QUESTION -->
+            <!-- =========================================
+                 QUESTION
+            ========================================== -->
 
             <div class="form-group">
 
@@ -391,7 +498,9 @@
             </div>
 
 
-            <!-- ASK BUTTON -->
+            <!-- =========================================
+                 ASK BUTTON
+            ========================================== -->
 
             <button
                 id="askButton"
@@ -413,7 +522,9 @@
             </button>
 
 
-            <!-- CLEAR CONVERSATION BUTTON -->
+            <!-- =========================================
+                 CLEAR CONVERSATION BUTTON
+            ========================================== -->
 
             <button
                 id="clearConversationButton"
@@ -426,7 +537,9 @@
             </button>
 
 
-            <!-- ERROR -->
+            <!-- =========================================
+                 ERROR
+            ========================================== -->
 
             <div
                 id="errorMessage"
